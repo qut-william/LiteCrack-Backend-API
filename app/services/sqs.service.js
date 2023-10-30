@@ -24,11 +24,3 @@ exports.sendMessage = async (body) => {
     })
   );
 };
-
-exports.main = async () => {
-  const { Messages } = await receiveMessage();
-
-  console.log(Messages);
-};
-
-this.main();

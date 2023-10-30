@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { S3Client, HeadObjectCommand, ListObjectsCommand } = require("@aws-sdk/client-s3");
+const { S3Client, GetObjectCommand, HeadObjectCommand, ListObjectsCommand } = require("@aws-sdk/client-s3");
 const { Upload } = require("@aws-sdk/lib-storage");
 
 const s3Client = new S3Client({});
@@ -16,6 +16,20 @@ exports.checkIfKeyExists = async (key) => {
     return true;
   } catch (error) {
     return false;
+  }
+};
+
+exports.getObject = async (key) => {
+  const params = {
+    Bucket: S3_BUCKET_NAME,
+    Key: key,
+  };
+
+  try {
+    const response = await s3Client.send(new GetObjectCommand(params));
+    return response;
+  } catch {
+    return null;
   }
 };
 
