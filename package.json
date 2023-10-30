@@ -1,0 +1,22 @@
+{
+  "name": "send-message",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "setup": "node create.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.438.0",
+    "@aws-sdk/client-sqs": "^3.438.0",
+    "@aws-sdk/lib-storage": "^3.438.0",
+    "colorette": "^2.0.20",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-async-handler": "^1.2.0",
+    "yargs": "^17.7.2"
+  }
+}
