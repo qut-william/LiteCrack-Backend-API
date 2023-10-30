@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js",
+    "start": "node index.js",
     "setup": "node create.js"
   },
   "author": "",
@@ -13,10 +15,17 @@
     "@aws-sdk/client-s3": "^3.438.0",
     "@aws-sdk/client-sqs": "^3.438.0",
     "@aws-sdk/lib-storage": "^3.438.0",
+    "body-parser": "^1.20.2",
     "colorette": "^2.0.20",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-async-handler": "^1.2.0",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
     "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }

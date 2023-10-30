@@ -2,7 +2,7 @@
 
 ## Installation
 
-Please ensure you have downloaded the latest version of Node (v18.17) [here](https://nodejs.org/en/download)
+Please ensure you have downloaded Node (I'm using v18.9.0) [here](https://nodejs.org/en/download)
 
 To install the necessary dependencies, please run the following command:
 
