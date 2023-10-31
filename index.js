@@ -6,14 +6,14 @@ const bodyParser = require("body-parser");
 
 require("dotenv").config();
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 5000;
 
 app.use(bodyParser.json());
 app.use(cors());
 app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: false }));
 
-const wordlist = require("./app/routes/wordlists.js");
+const wordlist = require("./app/routes/wordlist.js");
 const hash = require("./app/routes/hash.js");
 const errorHandler = require("./app/middleware/errorHandler.js");
 
