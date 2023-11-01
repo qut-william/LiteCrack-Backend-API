@@ -8,24 +8,31 @@ exports.crack = asyncHandler(async (req, res) => {
   if (!hash) return res.status(400).json({ error: true, message: "No hash provided" });
   if (!wordlist) return res.status(400).json({ error: true, message: "No wordlist selected" });
 
+  // Check if wordlist exist
   const wordlistKey = "wordlists/" + wordlist + ".txt";
   if (!(await checkIfKeyExists(wordlistKey)))
     return res.status(400).json({ error: true, message: "Wordlist does not exist" });
 
-  const hashKey = "hashes/" + wordlist + hash + ".json";
-
-  // Try see and get the object if it already exists (pending/successful)
-  const hashObject = await getObject(hashKey);
-  if (hashObject) {
-    const resObject = JSON.parse(await hashObject.Body.transformToString());
-    return res.status(resObject.status == "pending" ? 202 : 200).json(resObject);
+  // Check if hash is already cracked
+  const crackedHashKey = "cracked/" + hash + ".json";
+  if (await checkIfKeyExists(crackedHashKey)) {
+    const crackedHashObject = await getObject(crackedHashKey);
+    const resObject = JSON.parse(await crackedHashObject.Body.transformToString());
+    return res.status(200).json(resObject);
   }
 
-  const objectBody = JSON.stringify({ hash: hash, cracked: null, status: "pending", created: new Date().getTime() });
+  // Check if hash is pending
+  const hashKey = "hashes/" + wordlist + hash + ".json";
+  if (await checkIfKeyExists(hashKey)) {
+    const hashObject = await getObject(hashKey);
+    const resObject = JSON.parse(await hashObject.Body.transformToString());
+    if (resObject.status === "pending") return res.status(202).json(resObject);
+    else return res.status(200).json(resObject);
+  }
 
-  // Try to send the message to the queue, and if successful, store the hash as pending
+  // Start a job to crack the hash
+  const objectBody = JSON.stringify({ hash: hash, status: "pending", created: new Date().getTime() });
   await sendMessage(JSON.stringify({ hash: hash, wordlist: wordlist }));
   await storeHash(hashKey, objectBody);
-
   return res.status(200).json({ message: "Upload successful" });
 });
