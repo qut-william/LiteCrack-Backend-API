@@ -26,12 +26,12 @@ exports.crack = asyncHandler(async (req, res) => {
   if (await checkIfKeyExists(hashKey)) {
     const hashObject = await getObject(hashKey);
     const resObject = JSON.parse(await hashObject.Body.transformToString());
-    if (resObject.status === "pending") return res.status(202).json(resObject);
+    if (resObject.status === "PENDING") return res.status(202).json(resObject);
     else return res.status(200).json(resObject);
   }
 
   // Start a job to crack the hash
-  const objectBody = JSON.stringify({ hash: hash, status: "pending", created: new Date().getTime() });
+  const objectBody = JSON.stringify({ hash: hash, status: "PENDING", created: new Date().getTime() });
   await sendMessage(JSON.stringify({ hash: hash, wordlist: wordlist }));
   await storeHash(hashKey, objectBody);
   return res.status(200).json({ message: "Upload successful" });
