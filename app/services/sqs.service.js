@@ -1,20 +1,8 @@
 require("dotenv").config();
-const { SQSClient, ReceiveMessageCommand, SendMessageCommand, DeleteMessageCommand } = require("@aws-sdk/client-sqs");
+const { SQSClient, SendMessageCommand } = require("@aws-sdk/client-sqs");
 
-const client = new SQSClient({});
+const client = new SQSClient({ region: process.env.AMAZON_REGION });
 const SQS_QUEUE_URL = process.env.SQS_QUEUE_URL;
-
-const receiveMessage = async () =>
-  await client.send(
-    new ReceiveMessageCommand({
-      QueueUrl: SQS_QUEUE_URL,
-      AttributeNames: ["SentTimestamp"],
-      MaxNumberOfMessages: 1,
-      MessageAttributeNames: ["All"],
-      WaitTimeSeconds: 1,
-      VisibilityTimeout: 10,
-    })
-  );
 
 exports.sendMessage = async (body) => {
   await client.send(

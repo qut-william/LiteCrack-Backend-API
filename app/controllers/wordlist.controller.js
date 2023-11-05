@@ -2,11 +2,15 @@ const asyncHandler = require("express-async-handler");
 const { createWordlist, checkIfKeyExists, getAllWordLists } = require("../services/s3.service");
 
 exports.upload = asyncHandler(async (req, res) => {
-  const { name } = req.params;
-  if (!req.file) return res.status(400).json({ error: true, message: "No file uploaded" });
-  if (!name) return res.status(400).json({ error: true, message: "No name provided" });
+  const { wordlist } = req.params;
 
-  const objectKey = "wordlists/" + name + ".txt";
+  // Remove any /s from the wordlist (because they're used in S3 keys).
+  const cleanWordList = wordlist.replace(/\//g, "\\");
+
+  if (!req.file) return res.status(400).json({ error: true, message: "No file uploaded" });
+  if (!cleanWordList) return res.status(400).json({ error: true, message: "No name provided" });
+
+  const objectKey = "wordlists/" + cleanWordList + ".txt";
   if (await checkIfKeyExists(objectKey)) return res.status(400).json({ error: true, message: "Name already taken" });
 
   const fileData = req.file.buffer;

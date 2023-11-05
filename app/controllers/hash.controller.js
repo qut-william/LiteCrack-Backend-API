@@ -5,16 +5,20 @@ const { sendMessage } = require("../services/sqs.service");
 exports.crack = asyncHandler(async (req, res) => {
   const { hash, wordlist } = req.body;
 
-  if (!hash) return res.status(400).json({ error: true, message: "No hash provided" });
-  if (!wordlist) return res.status(400).json({ error: true, message: "No wordlist selected" });
+  // Remove any /s from the hash and wordlist (because they're used in S3 keys).
+  const cleanHash = hash.replace(/\//g, "\\");
+  const cleanWordList = wordlist.replace(/\//g, "\\");
+
+  if (!cleanHash) return res.status(400).json({ error: true, message: "No hash provided" });
+  if (!cleanWordList) return res.status(400).json({ error: true, message: "No wordlist selected" });
 
   // Check if wordlist exist
-  const wordlistKey = "wordlists/" + wordlist + ".txt";
-  if (!(await checkIfKeyExists(wordlistKey)))
+  const wordListKey = "wordlists/" + cleanWordList + ".txt";
+  if (!(await checkIfKeyExists(wordListKey)))
     return res.status(400).json({ error: true, message: "Wordlist does not exist" });
 
   // Check if hash is already cracked
-  const crackedHashKey = "cracked/" + hash + ".json";
+  const crackedHashKey = "cracked/" + cleanHash + ".json";
   if (await checkIfKeyExists(crackedHashKey)) {
     const crackedHashObject = await getObject(crackedHashKey);
     const resObject = JSON.parse(await crackedHashObject.Body.transformToString());
@@ -22,7 +26,7 @@ exports.crack = asyncHandler(async (req, res) => {
   }
 
   // Check if hash is pending
-  const hashKey = "hashes/" + wordlist + hash + ".json";
+  const hashKey = "hashes/" + cleanWordList + cleanHash + ".json";
   if (await checkIfKeyExists(hashKey)) {
     const hashObject = await getObject(hashKey);
     const resObject = JSON.parse(await hashObject.Body.transformToString());
@@ -31,8 +35,8 @@ exports.crack = asyncHandler(async (req, res) => {
   }
 
   // Start a job to crack the hash
-  const objectBody = JSON.stringify({ hash: hash, status: "PENDING", created: new Date().getTime() });
-  await sendMessage(JSON.stringify({ hash: hash, wordlist: wordlist }));
+  const objectBody = JSON.stringify({ hash: cleanHash, status: "PENDING", created: new Date().getTime() });
+  await sendMessage(JSON.stringify({ hash: cleanHash, wordlist: cleanWordList }));
   await storeHash(hashKey, objectBody);
   return res.status(200).json({ message: "Upload successful" });
 });
